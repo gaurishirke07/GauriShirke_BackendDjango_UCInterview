@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Cocktail by Name or Ingredient</title>
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        input[type="text"] {
+            width: 300px;
+            padding: 8px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+        }
+
+        li {
+            margin-bottom: 20px;
+        }
+
+        .drink img {
+            width: 150px;
+            height: auto;
+        }
+        </style>
+
+
+</head>
+<body>
+    <h1>Search Cocktail</h1>
+
+    <form method = "get">
+        <input type = "text" name = "query">
+        <button type = "submit">Search</button>
+    </form>
+
+{% if query %}
+    <h2>Results for "{{ query }}"</h2>
+    {% if search_results %}
+        <ul>
+        {% for item in search_results %}
+            <li class = 'drink'>
+                <h3>
+                    <a href="{% url 'detail page' item.id %}">
+                    <strong>{{item.name}}</strong>
+                    </a>
+                </h3>
+                <img src = "{{ item.thumbnail }}" alt="{{ item.name }}" style="width:150px; height: auto">
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+    <p>No results found.</p>
+    {% endif %}
+{% endif %}
+</body>
+</html>
