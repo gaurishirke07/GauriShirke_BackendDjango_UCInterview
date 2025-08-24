@@ -4,7 +4,7 @@
     <title>Popular Cocktails</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
-        table { border-collapse: collapse; width: 50%; }
+        table { border-collapse: collapse; width: 90%; }
         th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left }
         a.delete-btn {color: white; background-color: red; padding: 4px 8px;}
     </style>
@@ -14,12 +14,27 @@
     <table>
         <tr>
             <th>Cocktail Name</th>
+            <th>Alcoholic</th>
+            <th>Instructions</th>
+            <th>Ingredients</th>
             <th>Search Count</th>
             <th>Action</th>
         </tr>
         {% for cocktail in cocktails %}
         <tr>
-            <td>{{ cocktail.name }}</td>
+            <td>
+                <h3>{{ cocktail.name }}</h3><br>
+                <img src="{{ cocktail.image }}" alt="{{ cocktail.name }}" style="width:200px;">
+            </td>
+            <td>{{ cocktail.alcoholic }}</td>
+            <td>{{ cocktail.instructions }}</td>
+            <td>
+                <ul>
+                    {% for item in cocktail.ingredients %}
+                        <li>{{ item.ingredient }} - {{ item.measure }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
             <td>{{ cocktail.search_count }}</td>
             <td>
                 <a class="delete-btn" href="{% url 'delete cocktail' cocktail.id %}">Delete</a>
@@ -27,7 +42,7 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="2">No searches yet.</td>
+            <td colspan="6">No searches yet.</td>
         </tr>
         {% endfor %}
     </table>

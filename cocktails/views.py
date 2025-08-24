@@ -20,12 +20,6 @@ def search_page(request):
             if drinks1:
                 name_results += [{'id': drink['idDrink'], 'name': drink['strDrink'], 'thumbnail': drink['strDrinkThumb']} for drink in drinks1]
 
-                for drink in drinks1:
-                    if (query == drink['strDrink']):
-                        cocktail_obj, created = PopularCocktail.objects.get_or_create(name=query)
-                        cocktail_obj.search_count +=1
-                        cocktail_obj.save()
-
 
         ingredients = query.split()
         ingredient_cocktail_set = []
@@ -39,13 +33,13 @@ def search_page(request):
                 if drinks2:
                     ingredient_cocktail_set.append({(drink['idDrink'], drink['strDrink'], drink['strDrinkThumb'])for drink in drinks2 if isinstance(drink,dict)})
 
-            if ingredient_cocktail_set:
-                if len(ingredient_cocktail_set) == 1:
-                    ingredient_results = ingredient_cocktail_set[0]
-                else:
-                    ingredient_results = set.intersection(*ingredient_cocktail_set)
+        if ingredient_cocktail_set:
+            if len(ingredient_cocktail_set) == 1:
+                ingredient_results = ingredient_cocktail_set[0]
+            else:
+                ingredient_results = set.intersection(*ingredient_cocktail_set)
 
-            ingredient_results = [{'id': id, 'name': name, 'thumbnail': thumb} for (id, name, thumb) in ingredient_results]
+        ingredient_results = [{'id': id, 'name': name, 'thumbnail': thumb} for (id, name, thumb) in ingredient_results]
 
         search_results = name_results + ingredient_results
 
@@ -67,8 +61,26 @@ def detail_page(request, item_id):
                 ingredient = drink.get(f'strIngredient{i}')
                 measure = drink.get(f'strMeasure{i}')
                 if ingredient:
-                    ingredients.append({'ingredient': ingredient, 'measure': measure})
+                    ingredients.append({
+                        'ingredient': ingredient if ingredient else None,
+                        'measure': measure if measure else None,
+                    })
 
+            cocktail_obj, created = PopularCocktail.objects.get_or_create(
+                cocktail_id=drink['idDrink'],
+                defaults={
+                    'name': drink['strDrink'],
+                    'image': drink['strDrinkThumb'],
+                    'alcoholic': drink['strAlcoholic'],
+                    'instructions': drink.get('strInstructions'),
+                    'ingredients': ingredients,
+                    'search_count': 1,
+                }
+            )
+
+            if not created:
+                cocktail_obj.search_count += 1
+                cocktail_obj.save()
 
             context = {
                 'name': drink['strDrink'],
